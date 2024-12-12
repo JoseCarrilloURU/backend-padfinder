@@ -37,14 +37,9 @@ class UserController {
         }
 
         if (swipe) {
-          const swipeUser = await User.findById(swipe)
-            .populate({
-              path: 'person_id',
-              populate: {
-                path: 'genre',
-              },
-            })
-            .select('-image -password');
+          const swipeUser = await User.findById(swipe).select(
+            '-image -password',
+          );
           if (!swipeUser) {
             return res
               .status(404)
@@ -128,13 +123,36 @@ class UserController {
           );
 
           const pendingMatches = await Match.find({
-            target_user: swipe,
-            status_match: 'pending',
+            $or: [
+              { source_user: swipe, status_match: 'pending' },
+              { target_user: swipe, status_match: 'pending' },
+            ],
+          }).populate('source_user target_user');
+
+          const pendingUserIds = new Set([
+            ...pendingMatches.map((match) => match.target_user._id.toString()),
+            ...pendingMatches.map((match) => match.source_user._id.toString()),
+          ]);
+
+          const pendingMatchMap = new Map();
+          pendingMatches.forEach((match) => {
+            pendingMatchMap.set(
+              match.target_user._id.toString(),
+              match._id.toString(),
+            );
+            pendingMatchMap.set(
+              match.source_user._id.toString(),
+              match._id.toString(),
+            );
           });
 
-          const pendingUserIds = new Set(
-            pendingMatches.map((match) => match.source_user.toString()),
-          );
+          users = users.map((user) => {
+            const userObj = user.toObject();
+            if (pendingUserIds.has(user._id.toString())) {
+              userObj.match_id = pendingMatchMap.get(user._id.toString());
+            }
+            return userObj;
+          });
 
           users.sort((a, b) => {
             const aIsPending = pendingUserIds.has(a._id.toString());
@@ -182,7 +200,6 @@ class UserController {
       });
     }
   };
-
   static createUser = async (req, res) => {
     try {
       const {
