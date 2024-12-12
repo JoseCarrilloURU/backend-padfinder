@@ -147,6 +147,26 @@ class UserController {
             }
             return 0;
           });
+
+          const rejectedMatches = await Match.find({
+            $or: [
+              { source_user: swipe, status_match: 'rejected' },
+              { target_user: swipe, status_match: 'rejected' },
+            ],
+          });
+
+          const rejectedUserIds = new Set();
+          rejectedMatches.forEach((match) => {
+            if (match.source_user.toString() === swipe) {
+              rejectedUserIds.add(match.target_user.toString());
+            } else {
+              rejectedUserIds.add(match.source_user.toString());
+            }
+          });
+
+          users = users.filter(
+            (user) => !rejectedUserIds.has(user._id.toString()),
+          );
         }
 
         return res.status(200).json({
