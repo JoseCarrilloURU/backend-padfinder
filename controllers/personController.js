@@ -37,8 +37,16 @@ class PersonController {
 
   static updatePerson = async (req, res) => {
     try {
-      const { id, name, lastname, email, genre, experience, preferred_genre } =
-        req.body;
+      const {
+        id,
+        name,
+        lastname,
+        email,
+        genre,
+        experience,
+        preferred_genre,
+        age,
+      } = req.body;
 
       const updatePerson = await Person.findByIdAndUpdate(
         id,
@@ -49,6 +57,7 @@ class PersonController {
           genre,
           experience,
           preferred_genre,
+          age,
         },
         {
           new: true,

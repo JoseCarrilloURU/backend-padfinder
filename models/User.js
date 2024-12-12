@@ -133,15 +133,18 @@ userSchema.statics.validateCredentials = async function (identifier, password) {
   if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier)) {
     const person = await Person.findOne({ email: identifier });
     if (person) {
-      user = await this.findOne({ person_id: person._id });
+      user = await this.findOne({ person_id: person._id }).populate(
+        'person_id',
+      );
     }
   } else {
-    user = await this.findOne({ username: identifier });
+    user = await this.findOne({ username: identifier }).populate('person_id');
   }
 
   if (user && (await Secure.compare(password, user.password))) {
     const userObject = user.toObject();
     delete userObject.password;
+    delete userObject.image;
     return userObject;
   } else {
     throw new Error('Invalid credentials');
