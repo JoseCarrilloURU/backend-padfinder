@@ -22,16 +22,12 @@ class SocketServer {
 
   #handleConnections() {
     this.io.on('connection', (socket) => {
-      console.log('Socket connected:', socket.id);
-
       socket.on('registerUser', ({ userId }) => {
         this.userSocketMap.set(userId, socket.id);
-        console.log(`User ${userId} register succesfully`);
       });
 
       socket.on('joinChat', ({ chatId }) => {
         socket.join(chatId);
-        console.log(`User joined chat ${chatId}`);
       });
 
       socket.on('disconnect', () => {
@@ -50,7 +46,6 @@ class SocketServer {
       throw new Error('Socket.IO instance is not initialized.');
     }
     this.io.to(chatId).emit('chatMessage', messagePayload);
-    console.log(`Message sent to chat ${chatId}:`, messagePayload);
   };
 
   emitMatchEvent(userId, sourceUserInfo) {
@@ -65,7 +60,6 @@ class SocketServer {
         msg: 'Nuevo match recibido',
         source_user: sourceUserInfo,
       });
-      console.log(`Match event sent to socket ${socketId}:`, sourceUserInfo);
     }
   }
 
