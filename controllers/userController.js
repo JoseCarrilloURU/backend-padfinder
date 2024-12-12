@@ -1,5 +1,6 @@
 import { User } from '../models/User.js';
 import PersonCourt from '../models/Person_Court.js';
+import Match from '../models/Match.js';
 
 class UserController {
   static getUsers = async (req, res) => {
