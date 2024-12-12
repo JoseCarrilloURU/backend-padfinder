@@ -7,15 +7,6 @@ import { routers } from './index.routers.js';
 const index = () => {
   const router = server.createRouterInstance();
 
-  const isDevEnviroment = verifyEnviroment();
-
-  if (!isDevEnviroment) {
-    server.addCustomMiddleware({
-      router,
-      middleware: authMiddleware,
-    });
-  }
-
   server.registerMultipleRouters({
     basePath: '/',
     baseRouter: router,
