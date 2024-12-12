@@ -5,7 +5,7 @@ class PersonController {
     try {
       const { id } = req.query;
       if (id) {
-        const person = await Person.findById(id);
+        const person = await Person.findById(id).populate('genre');
         if (!person)
           return res.status(404).json({
             msg: 'Persona no encontrada',

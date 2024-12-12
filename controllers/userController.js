@@ -8,7 +8,12 @@ class UserController {
 
       if (id) {
         const user = await User.findById(id)
-          .populate('person_id')
+          .populate({
+            path: 'person_id',
+            populate: {
+              path: 'genre',
+            },
+          })
           .select('-image -password');
         if (!user) {
           return res.status(404).json({ msg: 'Usuario no encontrado' });
@@ -19,7 +24,12 @@ class UserController {
         });
       } else {
         let users = await User.find()
-          .populate('person_id')
+          .populate({
+            path: 'person_id',
+            populate: {
+              path: 'genre',
+            },
+          })
           .select('-image -password');
         if (users.length <= 0) {
           return res.status(404).json({ msg: 'No se encontraron usuarios' });
@@ -27,7 +37,12 @@ class UserController {
 
         if (swipe) {
           const swipeUser = await User.findById(swipe)
-            .populate('person_id')
+            .populate({
+              path: 'person_id',
+              populate: {
+                path: 'genre',
+              },
+            })
             .select('-image -password');
           if (!swipeUser) {
             return res
